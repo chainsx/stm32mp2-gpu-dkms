@@ -1,0 +1,60 @@
+Package: stm32mp2-gpu-dkms
+Architecture: all
+Version: 6.4.21+20250226-1
+Priority: optional
+Section: kernel
+Maintainer: chainsx <chainsx@users.noreply.github.com>
+Depends: dkms (>= 2.8.4), make, gcc
+Conflicts: gcnano-dkms
+Replaces: gcnano-dkms
+Filename: ./stm32mp2-gpu-dkms_6.4.21+20250226-1_all.deb
+Size: 496730
+MD5sum: 62fa758c8732b2b40a598ebd3766d97b
+SHA1: d9bcfcdec0a12b6c4e5ee4880bad6189ac961499
+SHA256: cbd16b13d082879110084254568c0c6dee4cf3486977230d8686dc7443ce79c7
+SHA512: eb27005b37557a1bf5d76208e8bd1331601d1ab918d98a2465608c066d33dfac068f2e70d9790ac09ceb8bb88d7df540d580bbfea96ae10bae4a23cf8aab3edd
+Description: STM32MP2 Vivante GCNANO galcore module source for DKMS
+ This package contains ST's GCNANO galcore module source and registers it with
+ DKMS. It builds only on arm64 and always targets SOC_PLATFORM=st-mp2.
+ It requires matching kernel headers and an STM32MP2 GPU-enabled kernel/device tree.
+
+Package: stm32mp2-gpu-driver
+Architecture: all
+Version: 6.4.21+20250226-1
+Priority: optional
+Section: metapackages
+Maintainer: chainsx <chainsx@users.noreply.github.com>
+Depends: stm32mp2-gpu-dkms (= 6.4.21+20250226-1), stm32mp2-gpu-userspace (= 6.4.21+20250226-1)
+Filename: ./stm32mp2-gpu-driver_6.4.21+20250226-1_all.deb
+Size: 974
+MD5sum: b715754154527c384a530278038c531f
+SHA1: f53e0c0402d4b490a181d95719ca06472919bd70
+SHA256: 8da3e467d1e3acfe322ebc7c70a79283e78225f19aee931be9f17da339f700ae
+SHA512: 6ef2f64233e9059c44d783fc3f67c77306aa1a0a49997c62d3a064528e5238172e61083fde2a2bfd2277dc1f2eea768b3410e7e04e7cdc3be7f0f9bb24eca525
+Description: Meta-package for the STM32MP2 Vivante GCNANO driver stack
+ This package installs a matched STM32MP2 DKMS galcore module source package and
+ the matching ST GCNANO arm64 user-space driver payload.
+
+Package: stm32mp2-gpu-userspace
+Architecture: arm64
+Version: 6.4.21+20250226-1
+Multi-Arch: same
+Priority: optional
+Section: libs
+Maintainer: chainsx <chainsx@users.noreply.github.com>
+Provides: gcnano-userspace, gcnano-egl, gcnano-gles, gcnano-vivante-userspace
+Depends: libc6, libdrm2
+Recommends: libwayland-client0, libwayland-egl1
+Conflicts: gcnano-userland
+Replaces: gcnano-userland
+Filename: ./stm32mp2-gpu-userspace_6.4.21+20250226-1_arm64.deb
+Size: 11237192
+MD5sum: 81d80f6a4f08b4276ef324c179532208
+SHA1: b0391732409c970fb13ed4d21dd2ff66f372a0e8
+SHA256: 40993b98e553f703be2755159794c1f9e55dfeeaa8be6f5e64c16f506116cffc
+SHA512: 1d4b15c14af8b26f00237485f0a2deb3cd2554f904c194fbfccd4ad1f5fbe2e824c635f8a008d30529b5083120941e172f39932b92e144838c5f9fe1c82cd70a
+Description: STM32MP2 Vivante GCNANO proprietary user-space driver stack
+ This package contains ST-supplied arm64 GCNANO user-space libraries for STM32MP2.
+ It requires a compatible galcore kernel module and STM32MP2 GPU platform support.
+ The payload is subject to the upstream ST license/EULA.
+

@@ -1,0 +1,5 @@
+Types: deb
+URIs: https://chainsx.github.io/stm32mp2-gpu-dkms/debian
+Suites: ./
+Architectures: arm64
+Signed-By: /usr/share/keyrings/stm32mp2-gpu-archive-keyring.gpg

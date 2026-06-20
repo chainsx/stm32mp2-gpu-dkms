@@ -1,0 +1,9 @@
+Upstream URL: https://github.com/STMicroelectronics/gcnano-binaries
+Upstream branch: gcnano-6.4.21-binaries
+Upstream commit: dc7084b153d26087c12c1b08256cedf17fa12b06
+Generated UTC: 2026-06-20T16:53:49Z
+
+SHA256:
+cbd16b13d082879110084254568c0c6dee4cf3486977230d8686dc7443ce79c7  ./stm32mp2-gpu-dkms_6.4.21+20250226-1_all.deb
+8da3e467d1e3acfe322ebc7c70a79283e78225f19aee931be9f17da339f700ae  ./stm32mp2-gpu-driver_6.4.21+20250226-1_all.deb
+40993b98e553f703be2755159794c1f9e55dfeeaa8be6f5e64c16f506116cffc  ./stm32mp2-gpu-userspace_6.4.21+20250226-1_arm64.deb
