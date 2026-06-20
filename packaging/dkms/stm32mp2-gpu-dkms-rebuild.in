@@ -36,17 +36,18 @@ if ! command -v dkms >/dev/null 2>&1; then
     exit 1
 fi
 
+# Debian revisions do not form part of the DKMS source version. Refresh the
+# registration on every package configure so a new dkms.conf or wrapper is not
+# shadowed by the previously copied /var/lib/dkms metadata. This also makes a
+# failed "added" registration recoverable during dpkg --configure -a.
+dkms remove -m "$module" -v "$version" --all >/dev/null 2>&1 || true
+dkms add -m "$module" -v "$version"
+
 kernel_build="/lib/modules/$kernel_release/build"
 if [ ! -f "$kernel_build/Makefile" ]; then
     echo "$module: matching kernel headers are unavailable: $kernel_build/Makefile" >&2
-    echo "Install or expose the full headers/build tree for $kernel_release, then rerun this command." >&2
+    echo "The source was registered with DKMS; install or expose the full headers/build tree for $kernel_release, then rerun this command." >&2
     exit 2
-fi
-
-# DKMS add is idempotent only when the module is already known. Do not hide
-# unexpected registration errors.
-if ! dkms status -m "$module" -v "$version" >/dev/null 2>&1; then
-    dkms add -m "$module" -v "$version"
 fi
 
 echo "Building $module/$version for $kernel_release"

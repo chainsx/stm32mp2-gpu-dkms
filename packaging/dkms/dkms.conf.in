@@ -5,7 +5,9 @@ BUILT_MODULE_NAME[0]="galcore"
 BUILT_MODULE_LOCATION[0]="."
 DEST_MODULE_LOCATION[0]="/updates/dkms"
 AUTOINSTALL="yes"
-BUILD_EXCLUSIVE_ARCH="arm64"
+# DKMS matches the kernel architecture (uname -m), not dpkg's architecture.
+# AArch64 kernels report "aarch64" while Debian reports "arm64".
+BUILD_EXCLUSIVE_ARCH="^(aarch64|arm64)$"
 
 MAKE[0]="./dkms-make.sh ${kernelver}"
 CLEAN="make clean KERNEL_DIR=/lib/modules/${kernelver}/build || true"

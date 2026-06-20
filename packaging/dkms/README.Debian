@@ -4,6 +4,10 @@ stm32mp2-gpu-dkms for Debian/Ubuntu
 This package builds ST's Vivante GCNANO `galcore` kernel module through DKMS.
 It is intentionally restricted to ARM64 STM32MP2 systems and always builds:
 
+DKMS observes the running kernel architecture as `aarch64`; Debian observes the
+package architecture as `arm64`. The DKMS architecture gate therefore accepts
+both spellings.
+
     SOC_PLATFORM=st-mp2
     ARCH_TYPE=arm64
 
@@ -34,8 +38,10 @@ The package invokes Linux Kbuild exactly as the OpenSTLinux recipe does:
        AQROOT=/usr/src/stm32mp2-gpu-<version> KERNEL_DIR=/lib/modules/<kernel>/build \
        SOC_PLATFORM=st-mp2 modules
 
-The package intentionally leaves its source in the "added" DKMS state when
-matching headers are absent. Once headers are installed, rebuild explicitly:
+The package refreshes the DKMS registration at each package configuration. This
+ensures a new `dkms.conf` or build wrapper is used even when only the Debian
+revision changes. If matching headers are absent, the source remains registered
+in the "added" DKMS state. Once headers are installed, rebuild explicitly:
 
   sudo stm32mp2-gpu-dkms-rebuild
 
