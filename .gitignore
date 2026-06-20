@@ -1,0 +1,9 @@
+# Local build outputs and credentials
+/dist/
+/upstream/
+/.secrets/
+*.deb
+*.asc
+*.gpg
+*.kbx
+*.tmp
