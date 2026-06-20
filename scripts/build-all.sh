@@ -39,5 +39,7 @@ mkdir -p "$out_dir"
     --out "$out_dir" --maintainer "$maintainer"
 "$SCRIPT_DIR/build-userspace.sh" --source "$source_dir" --version "$version" --date "$release_date" \
     --out "$out_dir" --maintainer "$maintainer"
+"$SCRIPT_DIR/build-optional-userspace.sh" --source "$source_dir" --version "$version" --date "$release_date" \
+    --out "$out_dir" --maintainer "$maintainer"
 "$SCRIPT_DIR/build-meta.sh" --version "$version" --date "$release_date" \
     --out "$out_dir" --maintainer "$maintainer"

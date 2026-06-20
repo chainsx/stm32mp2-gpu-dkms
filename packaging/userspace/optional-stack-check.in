@@ -1,0 +1,50 @@
+#!/bin/sh
+set -eu
+libdir='@LIBDIR@'
+status=0
+
+fail() {
+    echo "error: $*" >&2
+    status=1
+}
+
+check_library() {
+    pattern="$1"
+    label="$2"
+    library="$(find "$libdir" -maxdepth 1 -type f -name "$pattern" -print | LC_ALL=C sort -V | head -n 1 || true)"
+    if [ -z "$library" ]; then
+        fail "missing ${label} library under ${libdir}"
+    else
+        echo "${label}: ${library}"
+    fi
+}
+
+check_opencl() {
+    icd=/etc/OpenCL/vendors/VeriSilicon.icd
+    check_library 'libOpenCL*.so.*' OpenCL
+    [ -s "$icd" ] || { fail "missing ${icd}"; return; }
+    library="$(cat "$icd")"
+    [ -f "$library" ] || fail "OpenCL ICD points to missing library: ${library}"
+}
+
+check_vulkan() {
+    json=/etc/vulkan/icd.d/VeriSilicon_icd.json
+    check_library 'libvulkan*.so*' Vulkan
+    [ -s "$json" ] || { fail "missing ${json}"; return; }
+    library="$(sed -n 's/.*"library_path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$json" | head -n 1)"
+    [ -n "$library" ] || { fail "Vulkan ICD lacks library_path"; return; }
+    [ -f "$library" ] || fail "Vulkan ICD points to missing library: ${library}"
+}
+
+check_openvx() {
+    profile=/etc/profile.d/openvx_profile.sh
+    check_library 'libOpenVX*.so*' OpenVX
+    check_library 'libNNGPUBinary.so' OpenVX-kernel
+    [ -f "$profile" ] || { fail "missing ${profile}"; return; }
+    grep -q '^export VIVANTE_SDK_DIR="/usr"$' "$profile" || fail "OpenVX profile has unexpected VIVANTE_SDK_DIR"
+}
+
+check_opencl
+check_vulkan
+check_openvx
+exit "$status"

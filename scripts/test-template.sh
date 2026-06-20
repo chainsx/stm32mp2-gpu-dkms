@@ -28,9 +28,9 @@ grep -q 'git push origin HEAD:main' "$ROOT/.github/workflows/build-publish.yml"
 ! git -C "$ROOT" check-ignore -q generated-test.deb
 ! git -C "$ROOT" check-ignore -q KEY.gpg
 
-# Verify the OpenSTLinux default GCNANO feature closure and policy. The package
-# must replace EGL/GBM/GLES APIs, retain libdrm/Wayland, reject GLVND and avoid
-# packaging optional OpenCL/Vulkan merely because a binary blob contains them.
+# Verify the default OpenSTLinux closure and the separately activated optional
+# OpenCL/OpenVX/Vulkan closures. No vendor library may be published without its
+# corresponding ICD, profile, or dependency package.
 grep -q "copy_exact libGAL.so" "$ROOT/scripts/build-userspace.sh"
 grep -q "copy_exact libVSC.so" "$ROOT/scripts/build-userspace.sh"
 grep -q "copy_exact libGLSLC.so" "$ROOT/scripts/build-userspace.sh"
@@ -41,8 +41,10 @@ grep -q "copy_glob 'libGLESv2.so.\*'" "$ROOT/scripts/build-userspace.sh"
 grep -q "copy_glob 'libOpenVG.so.\*'" "$ROOT/scripts/build-userspace.sh"
 grep -q 'Conflicts: gcnano-userland, libegl, libegl1, libegl-mesa0, libgbm, libgbm1' "$ROOT/scripts/build-userspace.sh"
 grep -q "dpkg-query -W -f='\${db:Status-Status}' libglvnd0" "$ROOT/scripts/build-userspace.sh"
-! grep -q 'OpenCL/vendors' "$ROOT/scripts/build-userspace.sh"
-! grep -q 'vulkan/icd.d' "$ROOT/scripts/build-userspace.sh"
+grep -q 'OpenCL/vendors/VeriSilicon.icd' "$ROOT/scripts/build-optional-userspace.sh"
+grep -q 'vulkan/icd.d/VeriSilicon_icd.json' "$ROOT/scripts/build-optional-userspace.sh"
+grep -q 'openvx_profile.sh' "$ROOT/scripts/build-optional-userspace.sh"
+grep -q 'unmapped vendor library' "$ROOT/scripts/build-optional-userspace.sh"
 
 command -v dpkg-deb >/dev/null
 command -v readelf >/dev/null
@@ -74,7 +76,9 @@ for name in \
     libGAL.so libVSC.so libGLSLC.so \
     libEGL.so.1 libgbm.so.1 libgbm_viv.so \
     libGLESv1_CM.so.1 libGLESv2.so.2 libOpenVG.so.1 \
-    libOpenCL.so.1 libvulkan.so.1; do
+    libCLC.so libSPIRV_viv.so libOpenCL_VSI.so.1 libvulkan_VSI.so.1.3 \
+    libOpenVX.so.1 libOpenVXU.so.1 libArchModelSw.so libNNArchPerf.so libovxlib.so \
+    libNNGPUBinary.so libNNVXCBinary.so libOvx12VXCBinary.so libOvxGPUVXCBinary.so; do
     cp "$work/elf" "$drv/$name"
 done
 printf 'mock EULA\n' > "$mock/gcnano-userland-multi-stm32mp2-6.4.21-20250226/LICENSE"
@@ -99,7 +103,9 @@ for name in \
   libGAL.so libVSC.so libGLSLC.so \
   libEGL.so.1 libgbm.so.1 libgbm_viv.so \
   libGLESv1_CM.so.1 libGLESv2.so.2 libOpenVG.so.1 \
-  libOpenCL.so.1 libvulkan.so.1; do
+  libCLC.so libSPIRV_viv.so libOpenCL_VSI.so.1 libvulkan_VSI.so.1.3 \
+  libOpenVX.so.1 libOpenVXU.so.1 libArchModelSw.so libNNArchPerf.so libovxlib.so \
+  libNNGPUBinary.so libNNVXCBinary.so libOvx12VXCBinary.so libOvxGPUVXCBinary.so; do
   cp "$dst/release/drivers/base" "$dst/release/drivers/$name"
 done
 rm "$dst/release/drivers/base"
@@ -124,8 +130,25 @@ grep -q 'dkms-make.sh' "$work/dkms.contents"
 grep -q 'libGAL.so' "$work/userspace.contents"
 grep -q 'libEGL.so ->' "$work/userspace.contents"
 grep -q 'libGLESv2.so ->' "$work/userspace.contents"
-! grep -q 'libOpenCL.so.1' "$work/userspace.contents"
-! grep -q 'libvulkan.so.1' "$work/userspace.contents"
+! grep -q 'libOpenCL_VSI.so.1' "$work/userspace.contents"
+! grep -q 'libvulkan_VSI.so.1.3' "$work/userspace.contents"
+for optional in stm32mp2-gpu-libclc stm32mp2-gpu-libspirv stm32mp2-gpu-opencl stm32mp2-gpu-vulkan stm32mp2-gpu-openvx stm32mp2-gpu-openvx-kernels stm32mp2-gpu-full; do
+    test -f "$work/out/${optional}_6.4.21+20250226-1_arm64.deb"
+done
+dpkg-deb -c "$work/out/stm32mp2-gpu-opencl_6.4.21+20250226-1_arm64.deb" | grep -q 'etc/OpenCL/vendors/VeriSilicon.icd'
+dpkg-deb -c "$work/out/stm32mp2-gpu-vulkan_6.4.21+20250226-1_arm64.deb" | grep -q 'etc/vulkan/icd.d/VeriSilicon_icd.json'
+dpkg-deb -c "$work/out/stm32mp2-gpu-openvx_6.4.21+20250226-1_arm64.deb" | grep -q 'etc/profile.d/openvx_profile.sh'
+dpkg-deb -c "$work/out/stm32mp2-gpu-full_6.4.21+20250226-1_arm64.deb" | grep -q 'GCNANO-LIBRARY-MAP.tsv'
+dpkg-deb -c "$work/out/stm32mp2-gpu-full_6.4.21+20250226-1_arm64.deb" | grep -q 'optional-stack-check'
+mkdir -p "$work/check-opencl" "$work/check-vulkan" "$work/check-openvx" "$work/check-full"
+dpkg-deb -x "$work/out/stm32mp2-gpu-opencl_6.4.21+20250226-1_arm64.deb" "$work/check-opencl"
+dpkg-deb -x "$work/out/stm32mp2-gpu-vulkan_6.4.21+20250226-1_arm64.deb" "$work/check-vulkan"
+dpkg-deb -x "$work/out/stm32mp2-gpu-openvx_6.4.21+20250226-1_arm64.deb" "$work/check-openvx"
+dpkg-deb -x "$work/out/stm32mp2-gpu-full_6.4.21+20250226-1_arm64.deb" "$work/check-full"
+grep -qx '/usr/lib/aarch64-linux-gnu/stm32mp2-gpu/libOpenCL_VSI.so.1' "$work/check-opencl/etc/OpenCL/vendors/VeriSilicon.icd"
+grep -q '"library_path": "/usr/lib/aarch64-linux-gnu/stm32mp2-gpu/libvulkan_VSI.so.1.3"' "$work/check-vulkan/etc/vulkan/icd.d/VeriSilicon_icd.json"
+grep -qx 'export VIVANTE_SDK_DIR="/usr"' "$work/check-openvx/etc/profile.d/openvx_profile.sh"
+grep -q '^libvulkan_VSI.so.1.3' "$work/check-full/usr/share/doc/stm32mp2-gpu-full/GCNANO-LIBRARY-MAP.tsv"
 dpkg-deb -e "$pkg" "$work/control"
 test -x "$work/control/preinst"
 test -x "$work/control/postinst"

@@ -23,7 +23,9 @@ rather than leaving two providers selected unpredictably.
 The following components are intentionally retained from the base rootfs and
 are not replaced: `libdrm`, Wayland, desktop OpenGL/GLX, GLVND, Mesa DRI
 software drivers, OpenCL and Vulkan. The binary recipe does not enable the
-latter two by default. The package refuses installation on a GLVND rootfs
+latter two by default. When present in the selected ST installer, this repository
+publishes them separately with their OpenCL ICD, Vulkan ICD or OpenVX profile
+configuration. The package refuses installation on a GLVND rootfs
 (`libglvnd0` installed), because the ST GCNANO EGL implementation is a direct
 non-GLVND provider.
 
@@ -31,6 +33,8 @@ Verify dynamic-linker selection after installation:
 
   /usr/lib/stm32mp2-gpu/graphics-stack-check
   ldconfig -p | grep -E 'libEGL|libgbm|libGLES|libOpenVG'
+
+For the complete installed feature inventory, inspect `/usr/share/doc/stm32mp2-gpu-full/GCNANO-LIBRARY-MAP.tsv` after installing `stm32mp2-gpu-full`.
 
 The package requires the matching `galcore` kernel module and STM32MP2 GPU
 platform configuration. It cannot add a missing GPU device-tree node, clocks,

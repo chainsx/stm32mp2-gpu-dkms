@@ -9,8 +9,15 @@ The package set is:
 | Package | Architecture | Role |
 |---|---:|---|
 | `stm32mp2-gpu-dkms` | `all` | Installs the GCNANO source for DKMS and builds `galcore.ko` on the target. |
-| `stm32mp2-gpu-userspace` | `arm64` | Installs the ST OpenSTLinux EGL/GBM/GLES/OpenVG provider closure and makes it the selected non-GLVND system provider. |
-| `stm32mp2-gpu-driver` | `all` | Installs the matched DKMS and user-space packages. |
+| `stm32mp2-gpu-userspace` | `arm64` | OpenSTLinux default aggregate: EGL, GBM, GLESv1, GLESv2 and OpenVG. |
+| `stm32mp2-gpu-libclc` | `arm64` | OpenCL/OpenVX compiler support, emitted only when present upstream. |
+| `stm32mp2-gpu-libspirv` | `arm64` | OpenCL/Vulkan SPIR-V support, emitted only when present upstream. |
+| `stm32mp2-gpu-opencl` | `arm64` | GCNANO OpenCL ICD plus `/etc/OpenCL/vendors/VeriSilicon.icd`. |
+| `stm32mp2-gpu-vulkan` | `arm64` | GCNANO Vulkan ICD plus `/etc/vulkan/icd.d/VeriSilicon_icd.json`. |
+| `stm32mp2-gpu-openvx` | `arm64` | OpenVX runtime plus `/etc/profile.d/openvx_profile.sh`. |
+| `stm32mp2-gpu-openvx-kernels` | `arm64` | OpenVX kernel binaries required by the OpenVX runtime. |
+| `stm32mp2-gpu-full` | `arm64` | Aggregate of all complete feature closures found in the selected ST installer. |
+| `stm32mp2-gpu-driver` | `all` | Installs the matched DKMS and default OpenSTLinux user-space stack. |
 
 ## Scope
 
@@ -42,8 +49,10 @@ system provider after `ldconfig`.
 This is a partial graphics-stack replacement, not a blanket Mesa removal. It
 does **not** replace `libdrm`, Wayland, desktop OpenGL/GLX, `libglvnd`, Mesa DRI,
 OpenCL or Vulkan. OpenCL, OpenVX and Vulkan are optional ST machine features;
-the default GCNANO recipe does not enable them, so this package does not copy
-those installer payloads or register their ICD files.
+the default `stm32mp2-gpu-userspace` aggregate does not install those payloads.
+When the selected installer includes a complete optional closure, this repository
+publishes it separately with the matching OpenCL ICD, Vulkan ICD or OpenVX
+profile configuration.
 
 The provider model requires a non-GLVND OpenSTLinux-compatible rootfs. The
 package aborts before installation when `libglvnd0` is installed, because the
@@ -62,6 +71,31 @@ APIs to `/usr/lib/aarch64-linux-gnu/stm32mp2-gpu`:
 /usr/lib/stm32mp2-gpu/graphics-stack-check
 ldconfig -p | grep -E 'libEGL|libgbm|libGLES|libOpenVG'
 ```
+
+## OpenSTLinux-aligned optional runtime closures
+
+The ST recipe keeps `libGAL.so` and `libVSC.so` as the vendor core; it then
+splits EGL, GBM, GLESv1, GLESv2, OpenVG, OpenCL, Vulkan, OpenVX, GLSLC, CLC and
+SPIR-V by runtime dependency. The default graphics closure remains in
+`stm32mp2-gpu-userspace` for a safe upgrade from revisions `-1` through `-3`.
+The feature-gated closures are emitted as dedicated packages only when the
+selected ST installer supplies their complete dependency set.
+
+No optional vendor library is published without the activation mechanism used
+by OpenSTLinux:
+
+- OpenCL writes `VeriSilicon.icd`; the system OpenCL ICD loader reads it.
+- Vulkan writes `VeriSilicon_icd.json`; `libvulkan1` reads it.
+- OpenVX writes the ST `VIVANTE_SDK_DIR=/usr` profile and installs an explicit
+  `stm32mp2-gpu-openvx-env` wrapper.
+- Optional libraries depend on `stm32mp2-gpu-userspace`, which owns the private
+  library-directory `ld.so.conf.d` entry needed by `libGAL`, `libVSC`, GLSLC,
+  CLC and SPIR-V.
+
+The optional-packaging step fails rather than silently discard any new
+`release/drivers/lib*.so*` file from a future ST installer. The generated
+`stm32mp2-gpu-full` package contains `GCNANO-LIBRARY-MAP.tsv`, mapping each
+recognized vendor library to its Debian package and loader/profile activation.
 
 ## Defaults pinned to current ST metadata
 
@@ -85,7 +119,7 @@ packages can be downloaded directly from this GitHub repository as well as
 consumed through GitHub Pages:
 
 ```text
-/debian/                         # three .deb files and signed flat APT metadata
+/debian/                         # component .deb files and signed flat APT metadata
 /debian/Packages{,.gz,.xz}
 /debian/Release /debian/Release.gpg /debian/InRelease
 /KEY.gpg                         # public key corresponding to the Actions secret
@@ -166,6 +200,10 @@ EOF2
 sudo apt update
 sudo apt install linux-headers-$(uname -r) build-essential dkms
 sudo apt install stm32mp2-gpu-driver
+
+# Optional: install every complete OpenCL/OpenVX/Vulkan closure emitted by
+# the selected ST installer.
+sudo apt install stm32mp2-gpu-full
 ```
 
 Verify the module and userspace stack:
@@ -176,6 +214,11 @@ sudo modprobe galcore
 modinfo galcore
 journalctl -k -b | grep -i -E 'galcore|vivante|gpu'
 stm32mp2-gpu-env eglinfo
+/usr/lib/stm32mp2-gpu/graphics-stack-check
+
+# Present after installing stm32mp2-gpu-full.
+/usr/lib/stm32mp2-gpu/optional-stack-check
+vulkaninfo
 ```
 
 If `linux-headers-$(uname -r)` is unavailable, obtain headers that exactly
