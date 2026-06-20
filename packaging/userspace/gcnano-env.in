@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+
+libdir='@LIBDIR@'
+if [ "$#" -eq 0 ]; then
+    echo "Usage: stm32mp2-gpu-env COMMAND [ARGUMENT ...]" >&2
+    exit 64
+fi
+
+export LD_LIBRARY_PATH="$libdir${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+exec "$@"

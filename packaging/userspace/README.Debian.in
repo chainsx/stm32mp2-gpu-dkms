@@ -1,0 +1,20 @@
+stm32mp2-gpu-userspace for Debian/Ubuntu
+==========================================
+
+This package contains the ARM64 STM32MP2-specific ST Vivante GCNANO user-space
+payload extracted from:
+
+  @INSTALLER@
+
+The vendor libraries are kept under:
+
+  @LIBDIR@
+
+and are activated system-wide with an ld.so configuration file. This may take
+precedence over Mesa implementations of EGL, GLES and related APIs. Remove the
+package, or remove its ld.so configuration file and run `ldconfig`, to revert.
+
+The package includes OpenCL and Vulkan ICD descriptors only when the extracted
+payload contains corresponding vendor libraries.
+
+Upstream commit: @UPSTREAM_COMMIT@

@@ -1,0 +1,10 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: ST Vivante GCNANO user-space driver
+Source: https://github.com/STMicroelectronics/gcnano-binaries
+
+Files: *
+Copyright: See the ST-provided LICENSE/EULA retained in this package
+License: LicenseRef-ST-proprietary
+ Comment:
+  The upstream OpenSTLinux metadata identifies this user-space payload as
+  proprietary. Redistribution must be authorized under the applicable ST EULA.

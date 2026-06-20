@@ -1,0 +1,27 @@
+stm32mp2-gpu-dkms for Debian/Ubuntu
+=====================================
+
+This package builds ST's Vivante GCNANO `galcore` kernel module through DKMS.
+It is intentionally restricted to ARM64 STM32MP2 systems and always builds:
+
+    SOC_PLATFORM=st-mp2
+    ARCH_TYPE=arm64
+
+A matching kernel build tree must be present at:
+
+    /lib/modules/<kernel-release>/build
+
+The package does not create the GPU device-tree node, clocks, power domains,
+reserved CMA memory, DRM/KMS integration, or firmware settings. It requires an
+STM32MP2 vendor-compatible kernel and board device tree that already describe
+the Vivante GPU.
+
+Useful checks:
+
+    dkms status
+    sudo modprobe galcore
+    modinfo galcore
+    journalctl -k -b | grep -i -E 'galcore|vivante|gpu'
+
+The source is copied from the STMicroelectronics `gcnano-binaries` checkout.
+The exact upstream commit is recorded under `/usr/share/doc/stm32mp2-gpu-dkms/`.

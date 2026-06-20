@@ -1,0 +1,5 @@
+Types: deb
+URIs: https://@GITHUB_OWNER@.github.io/@GITHUB_REPOSITORY@/debian
+Suites: ./
+Architectures: arm64
+Signed-By: /usr/share/keyrings/stm32mp2-gpu-archive-keyring.gpg
