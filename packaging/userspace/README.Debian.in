@@ -1,20 +1,39 @@
-stm32mp2-gpu-userspace for Debian/Ubuntu
-==========================================
+stm32mp2-gpu-userspace for OpenSTLinux-compatible ARM64 rootfs
+===============================================================
 
-This package contains the ARM64 STM32MP2-specific ST Vivante GCNANO user-space
-payload extracted from:
+This package contains the ARM64 STM32MP2-specific ST Vivante GCNANO runtime
+closure extracted from:
 
   @INSTALLER@
 
-The vendor libraries are kept under:
+It implements the same default userspace surface selected by ST's
+OpenSTLinux `gcnano-userland-binary` recipe:
+
+  EGL, GBM, GLESv1, GLESv2 and OpenVG
+
+The vendor libraries are placed under:
 
   @LIBDIR@
 
-and are activated system-wide with an ld.so configuration file. This may take
-precedence over Mesa implementations of EGL, GLES and related APIs. Remove the
-package, or remove its ld.so configuration file and run `ldconfig`, to revert.
+and activated first through `/etc/ld.so.conf.d/00-stm32mp2-gpu.conf`. The
+package declares `Provides`, `Conflicts` and `Replaces` for only the matching
+generic/Mesa API packages, so APT will remove the old EGL/GBM/GLES provider
+rather than leaving two providers selected unpredictably.
 
-The package includes OpenCL and Vulkan ICD descriptors only when the extracted
-payload contains corresponding vendor libraries.
+The following components are intentionally retained from the base rootfs and
+are not replaced: `libdrm`, Wayland, desktop OpenGL/GLX, GLVND, Mesa DRI
+software drivers, OpenCL and Vulkan. The binary recipe does not enable the
+latter two by default. The package refuses installation on a GLVND rootfs
+(`libglvnd0` installed), because the ST GCNANO EGL implementation is a direct
+non-GLVND provider.
+
+Verify dynamic-linker selection after installation:
+
+  /usr/lib/stm32mp2-gpu/graphics-stack-check
+  ldconfig -p | grep -E 'libEGL|libgbm|libGLES|libOpenVG'
+
+The package requires the matching `galcore` kernel module and STM32MP2 GPU
+platform configuration. It cannot add a missing GPU device-tree node, clocks,
+power domains, CMA reservation or DRM/KMS support.
 
 Upstream commit: @UPSTREAM_COMMIT@

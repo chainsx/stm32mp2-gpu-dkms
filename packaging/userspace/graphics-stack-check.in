@@ -1,0 +1,33 @@
+#!/bin/sh
+set -eu
+
+libdir='@LIBDIR@'
+status=0
+
+check_provider() {
+    stem="$1"
+    candidate="$(find "$libdir" -maxdepth 1 -type f -name "${stem}.so.*" -print | LC_ALL=C sort -V | head -n 1 || true)"
+    if [ -z "$candidate" ]; then
+        echo "missing GCNANO ${stem} runtime below ${libdir}" >&2
+        status=1
+        return
+    fi
+
+    resolved="$(ldconfig -p 2>/dev/null | awk -v stem="$stem" '$1 ~ ("^" stem "\\.so") {print $NF; exit}')"
+    case "$resolved" in
+        "$libdir"/*)
+            echo "${stem}: ${resolved}"
+            ;;
+        *)
+            echo "${stem}: expected provider under ${libdir}, got ${resolved:-not-found}" >&2
+            status=1
+            ;;
+    esac
+}
+
+check_provider libEGL
+check_provider libgbm
+check_provider libGLESv1_CM
+check_provider libGLESv2
+check_provider libOpenVG
+exit "$status"

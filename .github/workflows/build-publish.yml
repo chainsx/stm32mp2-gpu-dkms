@@ -19,9 +19,9 @@ on:
         default: "dc7084b153d26087c12c1b08256cedf17fa12b06"
         type: string
       package_revision:
-        description: "Debian package revision; use 2 to publish the observable DKMS rebuild fix"
+        description: "Debian package revision; use 3 to publish the OpenSTLinux Mesa-provider userspace fix"
         required: true
-        default: "2"
+        default: "3"
         type: string
       accept_st_eula:
         description: "I reviewed and accept the ST license/EULA applicable to this user-space payload"
