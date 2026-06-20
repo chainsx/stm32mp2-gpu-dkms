@@ -39,8 +39,28 @@ OpenSTLinux pin:    dc7084b153d26087c12c1b08256cedf17fa12b06
 ```
 
 The selected branch, resolved commit, and package SHA-256 values are written to
-`BUILD-MANIFEST.txt` in every Pages deployment. Update all three workflow inputs
+`BUILD-MANIFEST.txt` in every publication. Update all three workflow inputs
 together for a future ST release.
+
+## Generated repository files
+
+A successful manual workflow run writes the generated APT repository back to the
+`main` branch. The generated files are intentionally versioned, so the `.deb`
+packages can be downloaded directly from this GitHub repository as well as
+consumed through GitHub Pages:
+
+```text
+/debian/                         # three .deb files and signed flat APT metadata
+/debian/Packages{,.gz,.xz}
+/debian/Release /debian/Release.gpg /debian/InRelease
+/KEY.gpg                         # public key corresponding to the Actions secret
+/stm32mp2-gpu.sources            # source-list file for target devices
+/BUILD-MANIFEST.txt              # upstream pin and SHA-256 values
+```
+
+The workflow replaces the entire generated `debian/` directory on each run, so
+superseded packages and index files are removed from `main`. The private signing
+key remains only in the `APT_GPG_PRIVATE_KEY` Actions secret.
 
 ## Licensing and publication gate
 

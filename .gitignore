@@ -1,9 +1,8 @@
-# Local build outputs and credentials
+# Local-only build state and credentials. Published .deb, .gpg and APT index
+# files are intentionally tracked when GitHub Actions writes /debian to main.
 /dist/
 /upstream/
 /.secrets/
-*.deb
 *.asc
-*.gpg
 *.kbx
 *.tmp

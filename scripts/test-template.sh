@@ -14,6 +14,15 @@ grep -q 'BUILD_EXCLUSIVE_ARCH="arm64"' "$ROOT/packaging/dkms/dkms.conf.in"
 ! grep -RqsE 'stm32mp1|armhf|st-mp1' \
     "$ROOT"/README.md "$ROOT"/sources "$ROOT"/packaging "$ROOT"/scripts "$ROOT"/.github
 
+# Publication must persist the packages in main instead of limiting them to
+# short-lived Actions artifacts. The generated package types must also not be
+# hidden by .gitignore, otherwise `git add` cannot stage them.
+grep -q '^  contents: write$' "$ROOT/.github/workflows/build-publish.yml"
+grep -q 'Commit generated APT repository to main' "$ROOT/.github/workflows/build-publish.yml"
+grep -q 'git push origin HEAD:main' "$ROOT/.github/workflows/build-publish.yml"
+! git -C "$ROOT" check-ignore -q generated-test.deb
+! git -C "$ROOT" check-ignore -q KEY.gpg
+
 command -v dpkg-deb >/dev/null
 command -v readelf >/dev/null
 command -v python3 >/dev/null
