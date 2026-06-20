@@ -25,3 +25,19 @@ Useful checks:
 
 The source is copied from the STMicroelectronics `gcnano-binaries` checkout.
 The exact upstream commit is recorded under `/usr/share/doc/stm32mp2-gpu-dkms/`.
+
+DKMS build semantics
+--------------------
+The package invokes Linux Kbuild exactly as the OpenSTLinux recipe does:
+
+  make -C /lib/modules/<kernel>/build M=/usr/src/stm32mp2-gpu-<version> \
+       AQROOT=/usr/src/stm32mp2-gpu-<version> KERNEL_DIR=/lib/modules/<kernel>/build \
+       SOC_PLATFORM=st-mp2 modules
+
+The package intentionally leaves its source in the "added" DKMS state when
+matching headers are absent. Once headers are installed, rebuild explicitly:
+
+  sudo stm32mp2-gpu-dkms-rebuild
+
+On a real compiler failure, the helper returns non-zero and prints the final
+part of the relevant `/var/lib/dkms/.../make.log`; it does not suppress errors.

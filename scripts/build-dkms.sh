@@ -54,7 +54,7 @@ dkmsver="$(dkms_version "$version" "$release_date")"
 source_name="stm32mp2-gpu-${dkmsver}"
 
 mkdir -p "$pkgroot/DEBIAN" "$pkgroot/usr/src" "$pkgroot/etc/dkms" \
-    "$pkgroot/usr/share/doc/stm32mp2-gpu-dkms"
+    "$pkgroot/usr/sbin" "$pkgroot/usr/share/doc/stm32mp2-gpu-dkms"
 cp -a "$driver" "$pkgroot/usr/src/$source_name"
 rm -rf "$pkgroot/usr/src/$source_name/.git"
 
@@ -66,6 +66,14 @@ install -m 0644 "$ROOT/packaging/dkms/stm32mp2-gpu.conf" \
     "$pkgroot/etc/dkms/stm32mp2-gpu.conf"
 install -m 0644 "$ROOT/packaging/dkms/README.Debian" \
     "$pkgroot/usr/share/doc/stm32mp2-gpu-dkms/README.Debian"
+
+# Install the explicit rebuild utility before postinst is run.  It keeps the
+# module package observable: current packages must never silently swallow a
+# DKMS compiler failure.
+sed "s/@DKMS_VERSION@/$dkmsver/g" \
+    "$ROOT/packaging/dkms/stm32mp2-gpu-dkms-rebuild.in" \
+    > "$pkgroot/usr/sbin/stm32mp2-gpu-dkms-rebuild"
+chmod 0755 "$pkgroot/usr/sbin/stm32mp2-gpu-dkms-rebuild"
 
 license_file="$(first_license_file "$source_dir" || true)"
 if [[ -n "$license_file" ]]; then
@@ -83,7 +91,7 @@ Section: kernel
 Priority: optional
 Architecture: all
 Maintainer: ${maintainer}
-Depends: dkms (>= 2.8.4), make, gcc
+Depends: dkms (>= 2.8.4), kmod, make, gcc
 Conflicts: gcnano-dkms
 Replaces: gcnano-dkms
 Description: STM32MP2 Vivante GCNANO galcore module source for DKMS
@@ -92,18 +100,9 @@ Description: STM32MP2 Vivante GCNANO galcore module source for DKMS
  It requires matching kernel headers and an STM32MP2 GPU-enabled kernel/device tree.
 CONTROL
 
-cat > "$pkgroot/DEBIAN/postinst" <<POSTINST
-#!/bin/sh
-set -e
-if [ "\$1" = configure ] && command -v dkms >/dev/null 2>&1; then
-    dkms add -m stm32mp2-gpu -v '${dkmsver}' >/dev/null 2>&1 || true
-    # Kernel headers may be installed after this package. Do not leave dpkg in
-    # a broken state in that case; the normal DKMS trigger or dkms autoinstall
-    # will build galcore once matching headers appear.
-    dkms autoinstall -m stm32mp2-gpu -v '${dkmsver}' >/dev/null 2>&1 || true
-fi
-exit 0
-POSTINST
+sed "s/@DKMS_VERSION@/$dkmsver/g" \
+    "$ROOT/packaging/dkms/postinst.in" \
+    > "$pkgroot/DEBIAN/postinst"
 chmod 0755 "$pkgroot/DEBIAN/postinst"
 
 cat > "$pkgroot/DEBIAN/postrm" <<POSTRM

@@ -1,0 +1,66 @@
+#!/bin/sh
+# Rebuild and install the GCNANO module for a selected or running kernel.
+set -eu
+
+module=stm32mp2-gpu
+version='@DKMS_VERSION@'
+kernel_release="$(uname -r)"
+
+usage() {
+    echo "Usage: stm32mp2-gpu-dkms-rebuild [--kernel <kernel-release>]" >&2
+}
+
+if [ "${1:-}" = "--kernel" ]; then
+    [ "$#" -eq 2 ] || { usage; exit 64; }
+    kernel_release="$2"
+elif [ "$#" -ne 0 ]; then
+    usage
+    exit 64
+fi
+
+show_logs() {
+    found=0
+    for log in \
+        "/var/lib/dkms/$module/$version/build/make.log" \
+        /var/lib/dkms/"$module"/"$version"/*/*/log/make.log; do
+        [ -r "$log" ] || continue
+        found=1
+        echo "----- $log -----" >&2
+        tail -n 120 "$log" >&2 || true
+    done
+    [ "$found" -eq 1 ] || echo "No DKMS make.log was found." >&2
+}
+
+if ! command -v dkms >/dev/null 2>&1; then
+    echo "$module: dkms is not installed." >&2
+    exit 1
+fi
+
+kernel_build="/lib/modules/$kernel_release/build"
+if [ ! -f "$kernel_build/Makefile" ]; then
+    echo "$module: matching kernel headers are unavailable: $kernel_build/Makefile" >&2
+    echo "Install or expose the full headers/build tree for $kernel_release, then rerun this command." >&2
+    exit 2
+fi
+
+# DKMS add is idempotent only when the module is already known. Do not hide
+# unexpected registration errors.
+if ! dkms status -m "$module" -v "$version" >/dev/null 2>&1; then
+    dkms add -m "$module" -v "$version"
+fi
+
+echo "Building $module/$version for $kernel_release"
+if ! dkms build --force -m "$module" -v "$version" -k "$kernel_release"; then
+    echo "$module: DKMS build failed for $kernel_release." >&2
+    show_logs
+    exit 1
+fi
+
+if ! dkms install --force -m "$module" -v "$version" -k "$kernel_release"; then
+    echo "$module: DKMS install failed for $kernel_release." >&2
+    show_logs
+    exit 1
+fi
+
+depmod -a "$kernel_release"
+dkms status -m "$module" -v "$version" -k "$kernel_release"

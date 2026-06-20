@@ -1,0 +1,19 @@
+#!/bin/sh
+set -eu
+
+if [ "$1" = configure ]; then
+    # Missing matching headers is not a package-installation error: keep the
+    # source registered and report the exact remediation. A real compile or
+    # install failure is returned to dpkg together with the DKMS make.log.
+    if /usr/sbin/stm32mp2-gpu-dkms-rebuild; then
+        :
+    else
+        rc=$?
+        if [ "$rc" -eq 2 ]; then
+            exit 0
+        fi
+        exit "$rc"
+    fi
+fi
+
+exit 0

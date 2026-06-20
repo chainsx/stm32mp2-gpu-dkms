@@ -37,9 +37,16 @@ get_upstream_commit() {
     fi
 }
 
+package_revision() {
+    local revision="${PACKAGE_REVISION:-1}"
+    [[ "$revision" =~ ^[1-9][0-9]*$ ]] || die "PACKAGE_REVISION must be a positive integer"
+    printf '%s\n' "$revision"
+}
+
 package_version() {
-    local version="$1" date="$2"
-    printf '%s+%s-1\n' "$version" "$date"
+    local version="$1" date="$2" revision
+    revision="$(package_revision)"
+    printf '%s+%s-%s\n' "$version" "$date" "$revision"
 }
 
 dkms_version() {

@@ -10,6 +10,9 @@ done
 
 grep -q 'SOC_PLATFORM=st-mp2' "$ROOT/packaging/dkms/dkms-make.sh"
 grep -q 'KERNEL_DIR=' "$ROOT/packaging/dkms/dkms-make.sh"
+grep -q 'M="$module_dir"' "$ROOT/packaging/dkms/dkms-make.sh"
+grep -q 'AQROOT="$module_dir"' "$ROOT/packaging/dkms/dkms-make.sh"
+grep -q 'stm32mp2-gpu-dkms-rebuild' "$ROOT/scripts/build-dkms.sh"
 grep -q 'BUILD_EXCLUSIVE_ARCH="arm64"' "$ROOT/packaging/dkms/dkms.conf.in"
 ! grep -RqsE 'stm32mp1|armhf|st-mp1' \
     "$ROOT"/README.md "$ROOT"/sources "$ROOT"/packaging "$ROOT"/scripts "$ROOT"/.github

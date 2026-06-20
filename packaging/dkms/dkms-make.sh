@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
-# DKMS wrapper for STM32MP2 only.  The ST Makefile invokes Kbuild itself and
-# consumes KERNEL_DIR; passing Linux's O= argument here is ineffective.
+# DKMS wrapper for the STM32MP2 GCNANO kernel module.
+#
+# This deliberately reproduces the OpenSTLinux recipe invocation:
+#   make -C <kernel-build> M=<module-source> AQROOT=<module-source> ... modules
+# Calling the Vivante top-level Makefile hides this relationship and makes
+# failures harder to diagnose in DKMS logs.
 set -Eeuo pipefail
 
 kernelver="${1:?missing kernel version}"
@@ -24,17 +28,18 @@ case "$(dpkg --print-architecture 2>/dev/null || uname -m)" in
 esac
 
 if [[ ! -f "$kernel_build/Makefile" ]]; then
-    echo "stm32mp2-gpu-dkms: missing matching kernel headers at $kernel_build" >&2
+    echo "stm32mp2-gpu-dkms: missing matching kernel build Makefile: $kernel_build/Makefile" >&2
+    echo "Install headers/source built for kernel ${kernelver}, then rerun dkms." >&2
     exit 3
 fi
 
-# `gcnano-driver-stm32mp/Makefile` defines KERNEL_DIR and then delegates to
-# Kbuild, whose `all` target runs: make -C $(KERNEL_DIR) M=$(pwd) modules.
-# Build on the target, therefore no CROSS_COMPILE value is supplied.
-make -C "$module_dir" \
+# Keep this command structurally identical to the ST OpenSTLinux module recipe.
+# KERNEL_DIR is consumed by the Vivante source; M and AQROOT make the Linux
+# Kbuild invocation unambiguous and preserve the source-root include paths.
+exec make -C "$kernel_build" \
+    M="$module_dir" \
+    AQROOT="$module_dir" \
     KERNEL_DIR="$kernel_build" \
     SOC_PLATFORM=st-mp2 \
-    ARCH_TYPE=arm64 \
-    DEBUG="$GCNANO_DEBUG"
-
-test -f "$module_dir/galcore.ko"
+    DEBUG="$GCNANO_DEBUG" \
+    modules
