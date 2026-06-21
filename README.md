@@ -19,22 +19,6 @@ The package set is:
 | `stm32mp2-gpu-full` | `arm64` | Aggregate of all complete feature closures found in the selected ST installer. |
 | `stm32mp2-gpu-driver` | `all` | Installs the matched DKMS and default OpenSTLinux user-space stack. |
 
-## Scope
-
-The DKMS wrapper is hard-coded for the upstream STM32MP2 build parameters:
-
-```text
-SOC_PLATFORM=st-mp2
-ARCH_TYPE=arm64
-KERNEL_DIR=/lib/modules/<kernel-release>/build
-```
-
-It deliberately does not use an `O=` parameter because the ST upstream Makefile
-passes `KERNEL_DIR` into its Kbuild call. The package builds a kernel module; it
-does not add a missing Vivante GPU device-tree node, clocks, power domains, CMA
-reservation, or DRM/KMS configuration. Use it only with a GPU-enabled
-STM32MP2-compatible kernel and device tree.
-
 ## Debian/Ubuntu global GCNANO provider mode
 
 GCNANO uses the direct OpenSTLinux EGL/GBM/GLES/OpenVG ABI. On Debian/Ubuntu
@@ -98,26 +82,6 @@ The selected branch, resolved commit, and package SHA-256 values are written to
 `BUILD-MANIFEST.txt` in every publication. Update all three workflow inputs
 together for a future ST release.
 
-## Generated repository files
-
-A successful manual workflow run writes the generated APT repository back to the
-`main` branch. The generated files are intentionally versioned, so the `.deb`
-packages can be downloaded directly from this GitHub repository as well as
-consumed through GitHub Pages:
-
-```text
-/debian/                         # component .deb files and signed flat APT metadata
-/debian/Packages{,.gz,.xz}
-/debian/Release /debian/Release.gpg /debian/InRelease
-/KEY.gpg                         # public key corresponding to the Actions secret
-/stm32mp2-gpu.sources            # source-list file for target devices
-/BUILD-MANIFEST.txt              # upstream pin and SHA-256 values
-```
-
-The workflow replaces the entire generated `debian/` directory on each run, so
-superseded packages and index files are removed from `main`. The private signing
-key remains only in the `APT_GPG_PRIVATE_KEY` Actions secret.
-
 ## Licensing and publication gate
 
 The ST OpenSTLinux recipe marks the GCNANO user-space component as proprietary
@@ -131,35 +95,6 @@ The workflow refuses to run unless both manual confirmations are `true`:
 - `confirm_public_redistribution_rights`
 
 See [NOTICE-REDISTRIBUTION.md](NOTICE-REDISTRIBUTION.md).
-
-## GitHub setup for `chainsx/stm32mp2-gpu-dkms`
-
-The target repository currently has no files, so the initial push can be made
-from this template directory:
-
-```bash
-git init -b main
-git add .
-git commit -m "Add STM32MP2 GCNANO DKMS and APT Pages packaging"
-git remote add origin https://github.com/chainsx/stm32mp2-gpu-dkms.git
-git push -u origin main
-```
-
-Then configure **Settings → Pages → Source → GitHub Actions**.
-
-Create and export a dedicated archive-signing key locally:
-
-```bash
-./scripts/bootstrap-signing-key.sh \
-  --name "STM32MP2 GCNANO APT Archive" \
-  --email "cchainsx@gmail.com" \
-  --out .secrets
-```
-
-Add `.secrets/private-key.asc` as the Actions secret `APT_GPG_PRIVATE_KEY`.
-`APT_GPG_PASSPHRASE` is optional if the key was created with a passphrase.
-Run **Actions → Build and publish STM32MP2 GCNANO APT repository** and provide
-the two mandatory legal acknowledgements.
 
 ## Target-side installation
 
