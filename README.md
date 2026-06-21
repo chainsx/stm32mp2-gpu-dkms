@@ -35,42 +35,29 @@ does not add a missing Vivante GPU device-tree node, clocks, power domains, CMA
 reservation, or DRM/KMS configuration. Use it only with a GPU-enabled
 STM32MP2-compatible kernel and device tree.
 
-## OpenSTLinux graphics-provider model
+## Debian/Ubuntu global GCNANO provider mode
 
-The GCNANO userspace package is aligned with ST's `gcnano-userland-binary`
-recipe rather than copying every library found in the installer. Its default
-runtime closure is **EGL, GBM, GLESv1, GLESv2 and OpenVG**, plus `libGAL`,
-`libVSC` and the `libGLSLC` compiler library required by the default GLES/VG
-interfaces. It publishes the same generic API-provider relationships as the
-OpenSTLinux recipe: it `Provides`, `Conflicts` with and `Replaces` the matching
-EGL/GBM/GLES packages, so the vendor implementation becomes the selected
-system provider after `ldconfig`.
+GCNANO uses the direct OpenSTLinux EGL/GBM/GLES/OpenVG ABI. On Debian/Ubuntu
+this repository does **not** overwrite files owned by Mesa or GLVND and does
+not declare conflicts with `libegl1`, `libgbm1`, `libgles2`, or Mesa packages.
+Those packages remain installed so applications such as `kmscube` can satisfy
+their normal APT dependencies.
 
-This is a partial graphics-stack replacement, not a blanket Mesa removal. It
-does **not** replace `libdrm`, Wayland, desktop OpenGL/GLX, `libglvnd`, Mesa DRI,
-OpenCL or Vulkan. OpenCL, OpenVX and Vulkan are optional ST machine features;
-the default `stm32mp2-gpu-userspace` aggregate does not install those payloads.
-When the selected installer includes a complete optional closure, this repository
-publishes it separately with the matching OpenCL ICD, Vulkan ICD or OpenVX
-profile configuration.
+Instead, `stm32mp2-gpu-userspace` installs the direct Vivante libraries under
+`/usr/lib/aarch64-linux-gnu/stm32mp2-gpu` and registers that directory first in
+`/etc/ld.so.conf.d/00-stm32mp2-gpu.conf`. Compatible applications consequently
+select GCNANO by default without `LD_LIBRARY_PATH` or a wrapper. The build
+refuses to publish if the vendor SONAMEs are not ABI-compatible with the
+Debian/Ubuntu EGL, GBM, GLESv1, GLESv2 and OpenVG runtime names.
 
-The provider model requires a non-GLVND OpenSTLinux-compatible rootfs. The
-package aborts before installation when `libglvnd0` is installed, because the
-ST binary exposes a direct `libEGL.so` provider and must not replace a GLVND
-dispatch ABI. Before upgrade, run:
-
-```bash
-apt-get -s install --only-upgrade stm32mp2-gpu-driver
-dpkg-query -W -f='${db:Status-Status}\n' libglvnd0 2>/dev/null || true
-```
-
-After installation, verify that the dynamic linker resolves the five GCNANO
-APIs to `/usr/lib/aarch64-linux-gnu/stm32mp2-gpu`:
+After installation, verify default provider selection with:
 
 ```bash
 /usr/lib/stm32mp2-gpu/graphics-stack-check
-ldconfig -p | grep -E 'libEGL|libgbm|libGLES|libOpenVG'
 ```
+
+OpenCL, OpenVX and Vulkan remain feature-specific and retain their respective
+ICD/profile activation methods.
 
 ## OpenSTLinux-aligned optional runtime closures
 
