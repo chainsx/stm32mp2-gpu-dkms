@@ -48,6 +48,7 @@ Priority: optional
 Architecture: all
 Maintainer: ${maintainer}
 Depends: stm32mp2-gpu-dkms (= ${pkgver}), stm32mp2-gpu-userspace (= ${pkgver})
+Recommends: stm32mp2-gpu-full (= ${pkgver})
 Description: Meta-package for the STM32MP2 Vivante GCNANO driver stack
  This package installs a matched STM32MP2 DKMS galcore module source package and
  the matching ST GCNANO arm64 user-space driver payload.

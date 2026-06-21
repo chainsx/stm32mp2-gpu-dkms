@@ -19,9 +19,9 @@ on:
         default: "dc7084b153d26087c12c1b08256cedf17fa12b06"
         type: string
       package_revision:
-        description: "Debian package revision; use 4 to publish the complete OpenSTLinux GCNANO runtime split"
+        description: "Debian package revision; use a value higher than every published revision"
         required: true
-        default: "4"
+        default: "6"
         type: string
       accept_st_eula:
         description: "I reviewed and accept the ST license/EULA applicable to this user-space payload"
@@ -128,7 +128,14 @@ jobs:
             --userland-date "${{ inputs.userland_date }}" \
             --out dist/debian \
             --maintainer "${{ github.repository_owner }} <${{ github.repository_owner }}@users.noreply.github.com>"
-          ./scripts/make-manifest.sh \
+          ./scripts/build-sdk.sh \
+    --source upstream \
+    --version "${{ inputs.gcnano_version }}" \
+    --date "${{ inputs.userland_date }}" \
+    --out dist/debian \
+    --maintainer "${{ github.repository_owner }} <${{ github.repository_owner }}@users.noreply.github.com>"
+
+  ./scripts/make-manifest.sh \
             --source upstream \
             --packages dist/debian \
             --out dist/site/BUILD-MANIFEST.txt \

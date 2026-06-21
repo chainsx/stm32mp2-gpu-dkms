@@ -265,3 +265,17 @@ binary payload:
 
 This repository is independent packaging glue and is not affiliated with or
 supported by STMicroelectronics.
+
+## Complete SDK package
+
+`stm32mp2-gpu-sdk` contains every header and pkg-config file supplied by the
+selected ST installer. It depends on `stm32mp2-gpu-full`, which installs every
+complete OpenSTLinux-aligned runtime closure emitted by that installer. SDK
+headers are placed under `/usr/include/stm32mp2-gpu` so they do not overwrite
+Mesa or GLVND development headers on Debian/Ubuntu. Use:
+
+```sh
+/usr/lib/stm32mp2-gpu/sdk-env pkg-config --cflags <package>
+/usr/lib/stm32mp2-gpu/sdk-env <compiler-or-build-command>
+/usr/lib/stm32mp2-gpu/sdk-check
+```
