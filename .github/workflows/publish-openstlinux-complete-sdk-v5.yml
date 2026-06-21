@@ -1,0 +1,185 @@
+name: Build, commit and publish complete STM32MP2 GCNANO SDK
+
+on:
+  workflow_dispatch:
+    inputs:
+      gcnano_version:
+        description: "ST GCNANO version; upstream branch is gcnano-<version>-binaries"
+        required: true
+        default: "6.4.21"
+        type: string
+      userland_date:
+        description: "Date in the STM32MP2 user-space installer filename (YYYYMMDD)"
+        required: true
+        default: "20250226"
+        type: string
+      upstream_commit:
+        description: "Optional exact ST upstream commit; leave default for the OpenSTLinux scarthgap pin"
+        required: false
+        default: "dc7084b153d26087c12c1b08256cedf17fa12b06"
+        type: string
+      package_revision:
+        description: "New Debian revision; use a value higher than every published package revision"
+        required: true
+        default: "5"
+        type: string
+      accept_st_eula:
+        description: "I reviewed and accept the ST license/EULA applicable to this user-space payload"
+        required: true
+        default: false
+        type: boolean
+      confirm_public_redistribution_rights:
+        description: "I confirm I have rights to publish the resulting user-space .deb publicly"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: stm32mp2-gpu-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build complete OpenSTLinux runtime and SDK
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out main with write credentials
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Require a main-branch manual run
+        shell: bash
+        run: |
+          test "$GITHUB_REF" = "refs/heads/main" || {
+            echo "Run this workflow from main; current ref is $GITHUB_REF." >&2
+            exit 1
+          }
+
+      - name: Require explicit ST EULA and redistribution acknowledgements
+        shell: bash
+        run: |
+          test "${{ inputs.accept_st_eula }}" = true || {
+            echo "ST EULA acknowledgement is required." >&2
+            exit 1
+          }
+          test "${{ inputs.confirm_public_redistribution_rights }}" = true || {
+            echo "Public redistribution rights must be confirmed before publication." >&2
+            exit 1
+          }
+
+      - name: Install packaging tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            apt-utils binutils ca-certificates dpkg-dev file git gnupg make tar xz-utils
+
+      - name: Validate the package template
+        run: ./scripts/test-template.sh
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Import APT archive signing key
+        env:
+          APT_GPG_PRIVATE_KEY: ${{ secrets.APT_GPG_PRIVATE_KEY }}
+        run: |
+          test -n "$APT_GPG_PRIVATE_KEY" || {
+            echo "Missing Actions secret: APT_GPG_PRIVATE_KEY" >&2
+            exit 1
+          }
+          export GNUPGHOME="$RUNNER_TEMP/gnupg"
+          mkdir -p "$GNUPGHOME"
+          chmod 700 "$GNUPGHOME"
+          printf '%s' "$APT_GPG_PRIVATE_KEY" | gpg --batch --import
+          key_id="$(gpg --batch --with-colons --list-secret-keys | awk -F: '$1 == "fpr" {print $10; exit}')"
+          test -n "$key_id" || { echo "No secret signing key imported" >&2; exit 1; }
+          echo "GNUPGHOME=$GNUPGHOME" >> "$GITHUB_ENV"
+          echo "APT_SIGNING_KEY=$key_id" >> "$GITHUB_ENV"
+
+      - name: Fetch the selected ST release
+        run: |
+          args=(--version "${{ inputs.gcnano_version }}" --dest upstream)
+          if [ -n "${{ inputs.upstream_commit }}" ]; then
+            args+=(--commit "${{ inputs.upstream_commit }}")
+          fi
+          ./scripts/fetch-upstream.sh "${args[@]}"
+
+      - name: Build runtime packages and the complete SDK
+        run: |
+          export PACKAGE_REVISION="${{ inputs.package_revision }}"
+          ./scripts/build-all.sh \
+            --source upstream \
+            --version "${{ inputs.gcnano_version }}" \
+            --userland-date "${{ inputs.userland_date }}" \
+            --out dist/debian \
+            --maintainer "${{ github.repository_owner }} <${{ github.repository_owner }}@users.noreply.github.com>"
+          ./scripts/build-complete-sdk-v5.sh \
+            --source upstream \
+            --version "${{ inputs.gcnano_version }}" \
+            --date "${{ inputs.userland_date }}" \
+            --out dist/debian \
+            --maintainer "${{ github.repository_owner }} <${{ github.repository_owner }}@users.noreply.github.com>"
+          ./scripts/make-manifest.sh \
+            --source upstream \
+            --packages dist/debian \
+            --out dist/site/BUILD-MANIFEST.txt \
+            --branch "gcnano-${{ inputs.gcnano_version }}-binaries"
+
+      - name: Generate signed flat APT repository
+        env:
+          APT_GPG_PASSPHRASE: ${{ secrets.APT_GPG_PASSPHRASE }}
+        run: |
+          mkdir -p dist/site/debian
+          cp dist/debian/*.deb dist/site/debian/
+          ./scripts/update-apt-repo.sh \
+            --repo dist/site/debian \
+            --key-id "$APT_SIGNING_KEY" \
+            --public-key dist/site/KEY.gpg \
+            --origin "${{ github.repository }}" \
+            --label "STM32MP2 GCNANO APT Archive"
+          sed \
+            -e "s|@GITHUB_OWNER@|${{ github.repository_owner }}|g" \
+            -e "s|@GITHUB_REPOSITORY@|${{ github.event.repository.name }}|g" \
+            sources/stm32mp2-gpu.sources.in > dist/site/stm32mp2-gpu.sources
+          cp README.md NOTICE-REDISTRIBUTION.md dist/site/
+
+      - name: Commit generated APT repository to main
+        shell: bash
+        run: |
+          rm -rf debian
+          mkdir -p debian
+          cp -a dist/site/debian/. debian/
+          cp dist/site/KEY.gpg dist/site/stm32mp2-gpu.sources dist/site/BUILD-MANIFEST.txt .
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f debian KEY.gpg stm32mp2-gpu.sources BUILD-MANIFEST.txt
+          if git diff --cached --quiet; then
+            echo "Generated APT repository is unchanged."
+          else
+            git commit -m "Publish complete GCNANO SDK ${{ inputs.gcnano_version }}+${{ inputs.userland_date }}-${{ inputs.package_revision }}"
+            git push origin HEAD:main
+          fi
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: stm32mp2-gpu-complete-sdk-${{ inputs.gcnano_version }}-${{ inputs.userland_date }}-${{ inputs.package_revision }}
+          path: dist/site
+          if-no-files-found: error
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/site
+
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
