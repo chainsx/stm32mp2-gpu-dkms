@@ -1,18 +1,18 @@
 Package: stm32mp2-gpu-dkms
 Architecture: all
-Version: 6.4.21+20250226-5
+Version: 6.4.21+20250226-6
 Priority: optional
 Section: kernel
 Maintainer: chainsx <chainsx@users.noreply.github.com>
 Depends: dkms (>= 2.8.4), kmod, make, gcc
 Conflicts: gcnano-dkms
 Replaces: gcnano-dkms
-Filename: ./stm32mp2-gpu-dkms_6.4.21+20250226-5_all.deb
-Size: 498364
-MD5sum: fd8d63bf6cfb3ddb53acce474e19a91c
-SHA1: 3875a907c4524a0806db8473ebbca50c6e065173
-SHA256: daf9e3ed3bfe9686128c5f33948a0b9e22a72cd67a222335f41f94345a4a693a
-SHA512: 7141a8398fb96f3efe6c6d2e8ea21184de5c9482d2493642ddcd4c12070f3b01469b854fb25893f6c0cbd4c8219cb0f357549ca55eefdee131fb4b59bc6b3d74
+Filename: ./stm32mp2-gpu-dkms_6.4.21+20250226-6_all.deb
+Size: 498404
+MD5sum: 6b243805030b2c35759d2ff527729916
+SHA1: 412ccd746d4b07c5196a55481867bb7d967bce1c
+SHA256: 62a81dd93dfa4a35ac0c4cfa7caa15603b61a371a1596d6d5d64ea91a254a026
+SHA512: 16d7c0d966839bb4050a33d6c58082649981cd853a9af9f02441f68b098eaf18ec649045c06efc3cfab6ce1305612ecab1308aebecb526d8f9eeef81447ef97a
 Description: STM32MP2 Vivante GCNANO galcore module source for DKMS
  This package contains ST's GCNANO galcore module source and registers it with
  DKMS. It builds only on arm64 and always targets SOC_PLATFORM=st-mp2.
@@ -20,35 +20,36 @@ Description: STM32MP2 Vivante GCNANO galcore module source for DKMS
 
 Package: stm32mp2-gpu-driver
 Architecture: all
-Version: 6.4.21+20250226-5
+Version: 6.4.21+20250226-6
 Priority: optional
 Section: metapackages
 Maintainer: chainsx <chainsx@users.noreply.github.com>
-Depends: stm32mp2-gpu-dkms (= 6.4.21+20250226-5), stm32mp2-gpu-userspace (= 6.4.21+20250226-5)
-Filename: ./stm32mp2-gpu-driver_6.4.21+20250226-5_all.deb
-Size: 976
-MD5sum: 8c1366e240477741f2c2178915d76ab4
-SHA1: beab4abe6be41c1c718a6320ea8a99da33dddcb3
-SHA256: 6b1c97cf8929c5bb502e26687b545188bf70cdb6072d3cdfbf429997862c74a7
-SHA512: 8ea62607afee891a8a179f5c6bb9e7ed44e5d981e7e3e559c5df02acb2d1931f1ebddf7c8eab804b422af0aaac1d9ca9311b3af8934d40d809dd32dd8ec056f0
+Depends: stm32mp2-gpu-dkms (= 6.4.21+20250226-6), stm32mp2-gpu-userspace (= 6.4.21+20250226-6)
+Recommends: stm32mp2-gpu-full (= 6.4.21+20250226-6)
+Filename: ./stm32mp2-gpu-driver_6.4.21+20250226-6_all.deb
+Size: 990
+MD5sum: 9ef47aaf67bfbb126fed0dd1260eb56c
+SHA1: dfcf0e26366fd6ea3503228b11f1a199466e4f28
+SHA256: e3a6e2c784814b6ec051b0ce81e2424dd5d010a571f8186d66a34ffcfe8dceaf
+SHA512: 997a0e83cf47e608589c87de00f9a065bf109e81923f383ffa54d3db65cf96d5db2b0db76a1cb8f87f3d471ae71279853808f56d765930599bf57dd1d76a46f5
 Description: Meta-package for the STM32MP2 Vivante GCNANO driver stack
  This package installs a matched STM32MP2 DKMS galcore module source package and
  the matching ST GCNANO arm64 user-space driver payload.
 
 Package: stm32mp2-gpu-full
 Architecture: arm64
-Version: 6.4.21+20250226-5
+Version: 6.4.21+20250226-6
 Multi-Arch: same
 Priority: optional
 Section: libs
 Maintainer: chainsx <chainsx@users.noreply.github.com>
-Depends: stm32mp2-gpu-userspace (= 6.4.21+20250226-5), stm32mp2-gpu-libclc (= 6.4.21+20250226-5),stm32mp2-gpu-libspirv (= 6.4.21+20250226-5),stm32mp2-gpu-opencl (= 6.4.21+20250226-5),stm32mp2-gpu-vulkan (= 6.4.21+20250226-5),stm32mp2-gpu-openvx-kernels (= 6.4.21+20250226-5),stm32mp2-gpu-openvx (= 6.4.21+20250226-5)
-Filename: ./stm32mp2-gpu-full_6.4.21+20250226-5_arm64.deb
+Depends: stm32mp2-gpu-userspace (= 6.4.21+20250226-6), stm32mp2-gpu-libclc (= 6.4.21+20250226-6),stm32mp2-gpu-libspirv (= 6.4.21+20250226-6),stm32mp2-gpu-opencl (= 6.4.21+20250226-6),stm32mp2-gpu-vulkan (= 6.4.21+20250226-6),stm32mp2-gpu-openvx-kernels (= 6.4.21+20250226-6),stm32mp2-gpu-openvx (= 6.4.21+20250226-6)
+Filename: ./stm32mp2-gpu-full_6.4.21+20250226-6_arm64.deb
 Size: 1884
-MD5sum: 8c80e34ec3e78aa9119c66cbaa0958e7
-SHA1: e1c2fb9c04a7a61d604ddb174984283243da10e4
-SHA256: e6749b850b615a68ec99526664a2ce65355b8d8d23a2c70924d3fbbdb4552a27
-SHA512: adcb0436402a967a50386ce6fe908801c3ba8b212bd0ea21506b1a21eefaba814346958aa1f79545741e6ba9f932a8b17d6adb953736d9d57eb1ae2c6681d585
+MD5sum: c05d9abae7cfa3e18279782e18b44853
+SHA1: c92963117037ddf0c00dbf0b986a6c132ed64088
+SHA256: 0b8c47ffc6d51a5e1e3c886118b7d263bb4d6329352f05368882f54437b2b653
+SHA512: 079872ea5eb4f5870ecb14f1532d6ebec5b89e971946f6871b6b14ef35a5f541754e29186b3647e785344286a58d99b49ee71501c49a85688bd6ad8761092173
 Description: STM32MP2 GCNANO complete OpenSTLinux feature set
  GCNANO component split to mirror OpenSTLinux gcnano-userland runtime grouping.
  This package is generated only when the selected ST installer contains its full
@@ -56,18 +57,18 @@ Description: STM32MP2 GCNANO complete OpenSTLinux feature set
 
 Package: stm32mp2-gpu-libclc
 Architecture: arm64
-Version: 6.4.21+20250226-5
+Version: 6.4.21+20250226-6
 Multi-Arch: same
 Priority: optional
 Section: libs
 Maintainer: chainsx <chainsx@users.noreply.github.com>
-Depends: stm32mp2-gpu-userspace (= 6.4.21+20250226-5)
-Filename: ./stm32mp2-gpu-libclc_6.4.21+20250226-5_arm64.deb
-Size: 737138
-MD5sum: da04fd0305adbdc5c0dfc2373b5cdcbe
-SHA1: 77e296a69de1f74174ea9d082f946d089607956b
-SHA256: 7519c668c823053fb74629f5978dda51ea228e6e042fe1031a0bd1634efbbd20
-SHA512: 1c9b1a29dcad766ae1e7a532571ce5a1e1d09da68fcdca616545a6083fe305f3a34981b79201af47736b0bfd8c9dca9c5fb06f3ca83b40fbe434ae4f5e1e63b4
+Depends: stm32mp2-gpu-userspace (= 6.4.21+20250226-6)
+Filename: ./stm32mp2-gpu-libclc_6.4.21+20250226-6_arm64.deb
+Size: 737098
+MD5sum: 4771e5e354d02761ee9d8ef35855c532
+SHA1: 5e9c3831cdb6a094fa085394df07ce27c37b3a7e
+SHA256: 7ee6215991ab3702ed1e9b487d63430c71dae2c5c339ae62d06db03510f72abe
+SHA512: 48b08e04dfc83b5c819b916b1da43be1f46820ae2263e5d9c6b897d7838fc29ebc7bb4935cfe8ecd849176b3135bdab83e6a8855b931820106c6ce32c63e446c
 Description: STM32MP2 GCNANO OpenCL compiler support library
  GCNANO component split to mirror OpenSTLinux gcnano-userland runtime grouping.
  This package is generated only when the selected ST installer contains its full
@@ -75,18 +76,18 @@ Description: STM32MP2 GCNANO OpenCL compiler support library
 
 Package: stm32mp2-gpu-libspirv
 Architecture: arm64
-Version: 6.4.21+20250226-5
+Version: 6.4.21+20250226-6
 Multi-Arch: same
 Priority: optional
 Section: libs
 Maintainer: chainsx <chainsx@users.noreply.github.com>
-Depends: stm32mp2-gpu-userspace (= 6.4.21+20250226-5)
-Filename: ./stm32mp2-gpu-libspirv_6.4.21+20250226-5_arm64.deb
-Size: 103104
-MD5sum: 03deaa9addb8466e08e2da10f92f229b
-SHA1: 792a9d17a2e830459bd9bcb612ca9edbb79aa410
-SHA256: f404b3091835f59ca539d37b75e203264fa5efc79ddd4d38be62826a1677d0bc
-SHA512: da0efed7ae2ec8e962a462f06f3cda67710bcdabacaa839c9e8518376237c415d8672d515c0d0bbd0d6e0abf2af289c9ca2ee00682a608f3d5615c175f2d3f3a
+Depends: stm32mp2-gpu-userspace (= 6.4.21+20250226-6)
+Filename: ./stm32mp2-gpu-libspirv_6.4.21+20250226-6_arm64.deb
+Size: 103106
+MD5sum: 184f5ed0b68e01910cd3df17c8546855
+SHA1: 78a73d91f2d9bdc4745f3ea1e8fc89e28cf1de1d
+SHA256: aadad8d1314743f2e3dec399bf1679f3d89c338e9402a15a89c5d96eaa0a07f1
+SHA512: ec191037e3c756cab4b97d837515b4680ba4b5defd90332f1aef12556d9e17774c1f4743be439d191e0a6d491e7c2a96efc2ce0e7e358987b868b56baf56c419
 Description: STM32MP2 GCNANO SPIR-V support library
  GCNANO component split to mirror OpenSTLinux gcnano-userland runtime grouping.
  This package is generated only when the selected ST installer contains its full
@@ -94,18 +95,18 @@ Description: STM32MP2 GCNANO SPIR-V support library
 
 Package: stm32mp2-gpu-opencl
 Architecture: arm64
-Version: 6.4.21+20250226-5
+Version: 6.4.21+20250226-6
 Multi-Arch: same
 Priority: optional
 Section: libs
 Maintainer: chainsx <chainsx@users.noreply.github.com>
-Depends: stm32mp2-gpu-userspace (= 6.4.21+20250226-5), stm32mp2-gpu-libclc (= 6.4.21+20250226-5), stm32mp2-gpu-libspirv (= 6.4.21+20250226-5), ocl-icd-libopencl1 | libopencl1
-Filename: ./stm32mp2-gpu-opencl_6.4.21+20250226-5_arm64.deb
-Size: 226030
-MD5sum: bc55e61caf5d6b0501a9ba0412cc4af1
-SHA1: 864c0b8714964efd85767074d71fe3f736db4dcd
-SHA256: e9a55132a7ab7d5c05fdd659f051ed5afc8399f766575c21a05cf12a300805cf
-SHA512: 126b3a54ca6a5305619e319f2299ba383e8fdb629a6e701a4dab3a17cb40ca756d5ec140c0a217b983ec8d2fd6147269c62198884300430dd310317ecf592a1a
+Depends: stm32mp2-gpu-userspace (= 6.4.21+20250226-6), stm32mp2-gpu-libclc (= 6.4.21+20250226-6), stm32mp2-gpu-libspirv (= 6.4.21+20250226-6), ocl-icd-libopencl1 | libopencl1
+Filename: ./stm32mp2-gpu-opencl_6.4.21+20250226-6_arm64.deb
+Size: 226168
+MD5sum: 4a112df27f1f7ee7804daf10659d904f
+SHA1: b7c0541d2daf0045aec9036c4d85930e09489fd0
+SHA256: fa8333f4f0dd39a11959e09bcfed81d5f87dac48efafd2847602045d7d4ecae5
+SHA512: f0763a4e220e269033692117e1f7a0290ea6cf2fe55862c966762a2acd3fe80b54eee7ca1e456b9a5fba853403d265acd26f2f146e733184e887bb2759a7425d
 Description: STM32MP2 GCNANO OpenCL ICD driver
  GCNANO component split to mirror OpenSTLinux gcnano-userland runtime grouping.
  This package is generated only when the selected ST installer contains its full
@@ -113,18 +114,18 @@ Description: STM32MP2 GCNANO OpenCL ICD driver
 
 Package: stm32mp2-gpu-openvx-kernels
 Architecture: arm64
-Version: 6.4.21+20250226-5
+Version: 6.4.21+20250226-6
 Multi-Arch: same
 Priority: optional
 Section: libs
 Maintainer: chainsx <chainsx@users.noreply.github.com>
-Depends: stm32mp2-gpu-userspace (= 6.4.21+20250226-5)
-Filename: ./stm32mp2-gpu-openvx-kernels_6.4.21+20250226-5_arm64.deb
-Size: 2523130
-MD5sum: 9cd55eca598900734ecb6ca0c769ec1e
-SHA1: 5d6ee36d78cf8604231155ca2d092b5544c0253b
-SHA256: 4fee46929dcc9b76795c59033378b8554f0e1a966b8ae811bca3511b8cb6fca5
-SHA512: 3f0a9b53dad49b9dc644fdc740beefacd9fef66941d02b76d5c364ef7e3fe584fb6143a470e55f0202acd41d09e5a7fca668e6131e027495063108fcb097753a
+Depends: stm32mp2-gpu-userspace (= 6.4.21+20250226-6)
+Filename: ./stm32mp2-gpu-openvx-kernels_6.4.21+20250226-6_arm64.deb
+Size: 2523830
+MD5sum: 139e5ab3c33a554198405b060fbe599b
+SHA1: c06de3e81ac928125f01c9b2d347541e45af6e7f
+SHA256: 1b5ceb1f91f3a2f76c46118f949da5c4b017aa502f09765a14640d233932ce61
+SHA512: 6186c67f98f4ee882a5d6b456278089c47dcb9539590747f50edf80cec47b725a8ef110555d7e77a9caf2b808a0ce4e4dd83b7cbb394164529b1ea1138c1a799
 Description: STM32MP2 GCNANO OpenVX kernel binaries
  GCNANO component split to mirror OpenSTLinux gcnano-userland runtime grouping.
  This package is generated only when the selected ST installer contains its full
@@ -132,18 +133,18 @@ Description: STM32MP2 GCNANO OpenVX kernel binaries
 
 Package: stm32mp2-gpu-openvx
 Architecture: arm64
-Version: 6.4.21+20250226-5
+Version: 6.4.21+20250226-6
 Multi-Arch: same
 Priority: optional
 Section: libs
 Maintainer: chainsx <chainsx@users.noreply.github.com>
-Depends: stm32mp2-gpu-userspace (= 6.4.21+20250226-5), stm32mp2-gpu-libclc (= 6.4.21+20250226-5), stm32mp2-gpu-openvx-kernels (= 6.4.21+20250226-5)
-Filename: ./stm32mp2-gpu-openvx_6.4.21+20250226-5_arm64.deb
-Size: 3660180
-MD5sum: 913e3e444b76824a60fa48cfe415b3d6
-SHA1: 1ead85bd2e62d1ee6dccb7ec3566ba2d8e981b31
-SHA256: ffaf4c8a3a176a863d8c4626e312ccdc8c126e7ef481386b91a1114bf3d4270e
-SHA512: a24eff2b6f611b716c56c4e556742bdb3baece9a66a8bd4891e23976cf5376630bb8506207e162f22f44ee7cd99276a845fd19f663ba188e44ea4661ebe6aa0c
+Depends: stm32mp2-gpu-userspace (= 6.4.21+20250226-6), stm32mp2-gpu-libclc (= 6.4.21+20250226-6), stm32mp2-gpu-openvx-kernels (= 6.4.21+20250226-6)
+Filename: ./stm32mp2-gpu-openvx_6.4.21+20250226-6_arm64.deb
+Size: 3660222
+MD5sum: be67a0c3930d081b6ac0325cf0b16044
+SHA1: 3640a1439390136597681d121830b152653b0aea
+SHA256: ba9a7e815bdad418d5c44366abd53d26606586d669535923edc59b8756646f3a
+SHA512: b2179d60afbfa960f2a08caf25c52a83cf4df9ecc357ab6482950ed3f99b35c1b71f4d37eba059d09dab95df42d57eae272127a1507bad74199c045afa64f1fa
 Description: STM32MP2 GCNANO OpenVX runtime
  GCNANO component split to mirror OpenSTLinux gcnano-userland runtime grouping.
  This package is generated only when the selected ST installer contains its full
@@ -151,26 +152,25 @@ Description: STM32MP2 GCNANO OpenVX runtime
 
 Package: stm32mp2-gpu-sdk
 Architecture: arm64
-Version: 6.4.21+20250226-5
+Version: 6.4.21+20250226-6
 Priority: optional
 Section: libdevel
 Maintainer: chainsx <chainsx@users.noreply.github.com>
-Depends: stm32mp2-gpu-full (= 6.4.21+20250226-5)
-Filename: ./stm32mp2-gpu-sdk_6.4.21+20250226-5_arm64.deb
-Size: 200684
-MD5sum: dfd684175fc50b9471b97e4ad9d4b7ed
-SHA1: 2e8474911c7a3d8c9eeeb0134f45a70c0b5468f7
-SHA256: d050be1ccd9fbbb30d9f7713749173ce426c497679c1c14d477d22f9bfb95c65
-SHA512: 54bcb8aa521de4d4db4451f79ee7c9074732c52cdffe665524c1982131ed95f3ae0c7101b712a557aa81ed10de0f57cad6736dddb192f51d663b6ec1aee8a98e
-Description: Complete STM32MP2 GCNANO OpenSTLinux-compatible SDK
- This package installs all headers and pkg-config metadata supplied by the ST
- GCNANO STM32MP2 installer. Runtime libraries remain in their OpenSTLinux-
- aligned component packages; the dependency on stm32mp2-gpu-full ensures every
- mapped library and its OpenCL, Vulkan, or OpenVX activation file is installed.
+Depends: stm32mp2-gpu-full (= 6.4.21+20250226-6), pkgconf | pkg-config
+Filename: ./stm32mp2-gpu-sdk_6.4.21+20250226-6_arm64.deb
+Size: 200338
+MD5sum: cb4fa80935c35f629523df2b0624c93f
+SHA1: 5450e359174c8569f1b589ab9b1fe3521dc174e8
+SHA256: 9928f2b4bb51e55b692159a451fa0e463bc33f825b3de6ff775887409ba9e5f8
+SHA512: 297094ad05142c497aac1b3379b88a6a1f333167062c8ae4d43a11e34f387b4557fdf601261ad60b147b983631fa4b5700d0424d9d65bf44639ac528800a60d5
+Description: Development SDK for the STM32MP2 Vivante GCNANO stack
+ This package contains every header and pkg-config file supplied by the selected
+ ST GCNANO installer, plus development links not already owned by a runtime
+ package. It does not duplicate runtime library paths.
 
 Package: stm32mp2-gpu-userspace
 Architecture: arm64
-Version: 6.4.21+20250226-5
+Version: 6.4.21+20250226-6
 Multi-Arch: same
 Priority: optional
 Section: libs
@@ -180,12 +180,12 @@ Depends: libc6, libdrm2, libwayland-client0
 Recommends: libwayland-egl1
 Conflicts: gcnano-userland, libegl, libegl1, libegl-mesa0, libgbm, libgbm1, libgles1, libglesv1-cm1, libgles2, libglesv2-2
 Replaces: gcnano-userland, libegl, libegl1, libegl-mesa0, libgbm, libgbm1, libgles1, libglesv1-cm1, libgles2, libglesv2-2
-Filename: ./stm32mp2-gpu-userspace_6.4.21+20250226-5_arm64.deb
-Size: 3608476
-MD5sum: b1c72509d59a7486540da64cdc5699ad
-SHA1: 8a34933f1d5814c7d3b5faa587c7b11c3bb5609e
-SHA256: a727baa1e2962637efe45043716caf74d81f17771fd1adf47110e1cb023fa16f
-SHA512: 76b0ca4da87e3fc4f301eb3a72bb7d9f7d281bf000d206f10b3aaebe4634ecbc79884d9374f8283aac431abf7b8a234a293084697ee7fcbab9f509ba28016d6b
+Filename: ./stm32mp2-gpu-userspace_6.4.21+20250226-6_arm64.deb
+Size: 3609254
+MD5sum: 5ae32d8eb44be47d6fdf350042c68eb1
+SHA1: ad44d1ef5bf3e6e093a874015ccf2ee04b9bff0a
+SHA256: afc63f727acf0118d6d058681cfc86b6edddaead4e20c7a63d8308123803241f
+SHA512: 4fc1403739273cab6e5e95bcd29a6baf45ee2b2f4c52e5633ec675ed8de5b1b6b1fdc4a4e3211d06a4edc0b36278bcb1ea2fc77ae3bc817f0af90f0b07d4acc0
 Description: STM32MP2 GCNANO OpenSTLinux EGL/GBM/GLES provider stack
  This package installs the ST Vivante GCNANO user-space runtime closure used by
  OpenSTLinux for STM32MP2: EGL, GBM, GLESv1, GLESv2 and OpenVG.
@@ -195,18 +195,18 @@ Description: STM32MP2 GCNANO OpenSTLinux EGL/GBM/GLES provider stack
 
 Package: stm32mp2-gpu-vulkan
 Architecture: arm64
-Version: 6.4.21+20250226-5
+Version: 6.4.21+20250226-6
 Multi-Arch: same
 Priority: optional
 Section: libs
 Maintainer: chainsx <chainsx@users.noreply.github.com>
-Depends: stm32mp2-gpu-userspace (= 6.4.21+20250226-5), stm32mp2-gpu-libspirv (= 6.4.21+20250226-5), libvulkan1
-Filename: ./stm32mp2-gpu-vulkan_6.4.21+20250226-5_arm64.deb
-Size: 402274
-MD5sum: 36837c68cbf98403b3d1d42a1e6355b5
-SHA1: 1856deac30282776ea33ffbc45e7c9f1672faaa5
-SHA256: 2b0af6e6ff0b592a6e092f5c993fdb48a1ced92f0a94c76519dcceeb72352177
-SHA512: 799a89bd8cec313503a6f71cf16de898e5ad56b2c63899de956ebfff5d15177087600fada379086aaba3c2a110a6b6160e78bc1d64212df17943142956259ef4
+Depends: stm32mp2-gpu-userspace (= 6.4.21+20250226-6), stm32mp2-gpu-libspirv (= 6.4.21+20250226-6), libvulkan1
+Filename: ./stm32mp2-gpu-vulkan_6.4.21+20250226-6_arm64.deb
+Size: 401478
+MD5sum: 77e721913ffa44c5d062bff3def0d624
+SHA1: e4128a5eac33155d53a2fe642f725850a135bdad
+SHA256: 0b2c0d5abb75ca61fc29271be6a24c3a5470c71ec6166fc3d2297f88f1290704
+SHA512: ec0372051f5a9c62b46dce0efce1abca13d7ffb12e0ea13b28f5e5043b058aa334283001e84e750e836b9b69b8818acf54ffb3c1cee68c138997b94b8c404b41
 Description: STM32MP2 GCNANO Vulkan ICD driver
  GCNANO component split to mirror OpenSTLinux gcnano-userland runtime grouping.
  This package is generated only when the selected ST installer contains its full
