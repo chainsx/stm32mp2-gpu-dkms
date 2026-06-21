@@ -216,7 +216,7 @@ if "$has_opencl"; then
     sed "s|@LIBRARY_PATH@|$libdir/$opencl_lib|g" "$ROOT/packaging/userspace/opencl.icd.in" \
         > "$root/etc/OpenCL/vendors/VeriSilicon.icd"
     write_control "$root" "$package" 'STM32MP2 GCNANO OpenCL ICD driver' \
-        "$base_dep, stm32mp2-gpu-libclc (= ${pkgver}), stm32mp2-gpu-libspirv (= ${pkgver}), ocl-icd-libopencl1 | libopencl1"
+        "$base_dep, stm32mp2-gpu-libclc (= ${pkgver}), stm32mp2-gpu-libspirv (= ${pkgver}), ocl-icd-libopencl1 | libopencl1, libwayland-server0, libwayland-client0, libdrm2, libffi8"
     write_ldconfig_hooks "$root"
     finish_pkg "$root" "$package"
 fi
